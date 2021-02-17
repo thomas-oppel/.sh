@@ -5,6 +5,13 @@ exit
 ###################################################################################################
 ###miscellaneous
 ###################################################################################################
+sudo modprobe can
+sudo modprobe can-raw
+sudo modprobe slcan
+sudo slcan_attach -f -s4 -o /dev/ttyACM0
+sudo slcand ttyACM0 slcan0
+sudo ifconfig slcan0 up
+
 export bootargs="console=ttymxc0,115200n8 consoleblank=0 vt.global_cursor_default=0  root=/dev/mmcblk0p2 video=-32 overlayrw=/dev/mmcblk0p3"
 sudo ifconfig can0 txqueuelen 1000
 systemctl disable dptv
