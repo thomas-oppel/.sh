@@ -80,6 +80,35 @@ cat /proc/meminfo #get memory info
 cd ~/oe-core/build/tmp-glibc/work-shared/colibri-imx6/kernel-source/drivers/video/logo/ #path for splash file logo_custom_clut224.ppm
 
 ###################################################################################################
+###docker
+###################################################################################################
+
+docker system prune #remove unused data
+docker rmi $(docker images -a -q) #remove all images
+docker images purge #?
+docker ps -a #list all running container
+docker inspect <container_id or name>
+docker build -t <?:?> . #build docker image from Dockerfile
+
+#run docker image as container named "qt_build" (<work_dir> is where you checkout your project)
+docker run -d -p 32777:22 -v <work_dir>:/root/<your_path> --name qt_build ubuntu:qt_build
+
+#connect to container via SSH
+ssh root@localhost -p 32777 #password "root"
+
+#source build environment within container
+. /usr/local/oecore_dornier/environment-setup-cortexa9hf-neon-poky-linux-gnueabi
+
+#cd to <your_path>
+cd <your_path>
+
+#generate Makefile using cross-built qmake
+/etc/qt5dmo/qt5/bin/qmake <path_to_pro_file> CONFIG+=debug
+make -j<number_of_cores>
+
+docker load < qt_build.tar
+
+###################################################################################################
 ###uBlock Origin
 ###################################################################################################
 
@@ -144,6 +173,18 @@ auto vcan0
 ***************************************************************************************************
 [Match]
 Name=vcan0
+***************************************************************************************************
+
+###################################################################################################
+###assign static IP address in systemd-networkd
+###################################################################################################
+#generate file "eth0.network" in /etc/systemd/network
+***************************************************************************************************
+[Match]
+Name=eth0
+
+[Network]
+Address=192.168.0.20/24
 ***************************************************************************************************
 
 ###################################################################################################
