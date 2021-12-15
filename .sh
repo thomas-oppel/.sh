@@ -5,6 +5,13 @@ exit
 ###################################################################################################
 ###miscellaneous
 ###################################################################################################
+rsync -a --exclude=.cache --exclude=Downloads --progress /home/$USER /media/agto/agto/rsync
+libreoffice --headless --convert-to pdf <docx> #convert to pdf
+lp -P 1 <pdf> #print first page on default printer
+pdftk A=?.pdf B=?.pdf cat B1 A2-end output ?.pdf #generate PDF from several PDF files (merge, split, delete)
+
+git commit --amend --reset-author
+
 sudo modprobe can
 sudo modprobe can-raw
 sudo modprobe slcan
@@ -40,13 +47,10 @@ cat language.csv | ./language_csv_to_ini.py #CSV to INI for language.ini with py
 dd if=/dev/mmcblk1 of=/dev/mmcblk0 bs=1M conv=fsync
 Subsystem sftp internal-sftp #SSH hack for poky build (dmo)
 G_TLS_GNUTLS_PRIORITY="NORMAL:%COMPAT:+VERS-TLS1.0" evolution #start evolution with legacy TLS1.0 support
-pdftk A=?.pdf B=?.pdf cat B1 A2-end output ?.pdf #generate PDF from several PDF files (merge, split, delete)
 sudo usermod -aG plugdev $USER #accessing device without sudo
 ssh-keyscan -H 192.168.0.2 >> ~/.ssh/known_hosts #add host key to known_hosts file
 pkg-config --cflags --libs gtkmm-2.4 #get dependencies for gtkmm 2.4 for project settings in eclipse without using pkg-config plugin
 cmake -DCMAKE_PREFIX_PATH=$HOME/Qt/5.12.5/gcc_64 .. #...for compiling mxe
-qtcreator -graphicssystem raster #possible workaround for lazy Qt Creator
-qtcreator -graphicssystem native #possible workaround for lazy Qt Creator
 sudo adduser $USER dialout #add user to dialout group to connect serial via putty
 vboxmanage internalcommands createrawvmdk -filename ~/win7.vmdk -rawdisk /dev/sda -partitions 2 -relative #create raw virtual hard disk for virtual box
 ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa #generates authentication keys for SSH
@@ -477,13 +481,11 @@ fw_setenv setup 'setenv setupargs fec_mac=${ethaddr} no_console_suspend=1 vt.glo
 ###################################################################################################
 ###u-boot -> vidargs
 ###################################################################################################
-#MONITOR 
-fw_setenv vidargs video=mxcfb0:dev=lcd,EDT-WVGA,if=RGB24
+
+fw_setenv vidargs video=mxcfb0:dev=lcd,FusionF07A
+fw_setenv vidargs video=mxcfb0:dev=lcd,EDT-WVGA
 fw_setenv vidargs video=mxcfb0:dev=lcd,800x480M@60,if=RGB24,bpp=24 fbmem=32M
-
 fw_setenv vidargs video=mxcfb0:dev=hdmi,1280x1024M@60,if=RGB24 fbmem=32M
-
-#DISPLAY IN KERNEL
 fw_setenv vidargs video=mxcfb0:dev=lcd,ETML1010G0DKA@60,if=RGB24,bpp=24 video=mxcfb1:off fbmem=32M
 fw_setenv vidargs video=mxcfb0:dev=lcd,1280x800M@60,if=RGB24 video=mxcfb1:off fbmem=32M
 
@@ -583,3 +585,4 @@ WantedBy=multi-user.target
 systemctl enable X
 systemctl daemon-reload
 vi /etc/X11/xinit/xinitrc
+
