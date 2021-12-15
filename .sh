@@ -5,7 +5,7 @@ exit
 ###################################################################################################
 ###miscellaneous
 ###################################################################################################
-rsync -a --exclude=.cache --exclude=Downloads --progress /home/$USER /media/agto/agto/rsync
+rsync -a --exclude=.cache --exclude=Downloads --progress /home/$USER /media/agto/agto/rsync #sync home
 libreoffice --headless --convert-to pdf <docx> #convert to pdf
 lp -P 1 <pdf> #print first page on default printer
 pdftk A=?.pdf B=?.pdf cat B1 A2-end output ?.pdf #generate PDF from several PDF files (merge, split, delete)
