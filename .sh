@@ -5,6 +5,7 @@ exit
 ###################################################################################################
 ###miscellaneous
 ###################################################################################################
+QTWEBENGINE_DISABLE_SANDBOX=1
 rsync -a --exclude=.cache --exclude=Downloads --progress /home/$USER /media/agto/agto/rsync #sync home
 libreoffice --headless --convert-to pdf <docx> #convert to pdf
 lp -P 1 <pdf> #print first page on default printer
@@ -75,6 +76,7 @@ pmap -xq `pidof <app>` | sort -k2,3 | grep -c ? #memory map of specific process
 vi /etc/resolv.conf  #set nameserver to 10.239.135.101
 connmanctl config `connmanctl services | grep ethernet | awk '{print $3}'` --ipv4 manual 10.239.134.150 255.255.255.0 10.239.135.254 #set static IP and gateway
 connmanctl config `connmanctl services | grep ethernet | awk '{print $3}'` --ipv4 manual 192.168.0.2 255.255.255.0 #set static IP
+connmanctl config `connmanctl services | grep ethernet | awk '{print $3}'` --nameservers 10.239.130.200 #set DNS
 connmanctl enable ethernet #enable ethernet permanently
 ifconfig eth0 192.168.0.3/24
 ifconfig eth0 10.239.134.72 netmask 255.255.240.0
@@ -488,6 +490,7 @@ fw_setenv vidargs video=mxcfb0:dev=lcd,800x480M@60,if=RGB24,bpp=24 fbmem=32M
 fw_setenv vidargs video=mxcfb0:dev=hdmi,1280x1024M@60,if=RGB24 fbmem=32M
 fw_setenv vidargs video=mxcfb0:dev=lcd,ETML1010G0DKA@60,if=RGB24,bpp=24 video=mxcfb1:off fbmem=32M
 fw_setenv vidargs video=mxcfb0:dev=lcd,1280x800M@60,if=RGB24 video=mxcfb1:off fbmem=32M
+fw_setenv vidargs video=mxcfb0:dev=lcd,1920x1080M@60,if=RGB24 video=mxcfb1:off fbmem=32M
 
 ###################################################################################################
 ###commands for rotating display and touch
@@ -586,3 +589,6 @@ systemctl enable X
 systemctl daemon-reload
 vi /etc/X11/xinit/xinitrc
 
+10.239.130.211 #mailserver
+SoftwGit #git
+git20admin2! #gitadmin
