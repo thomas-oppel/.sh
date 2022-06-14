@@ -5,12 +5,14 @@ exit
 ###################################################################################################
 ###miscellaneous
 ###################################################################################################
+
 QTWEBENGINE_DISABLE_SANDBOX=1
 rsync -a --exclude=.cache --exclude=Downloads --progress /home/$USER /media/agto/agto/rsync #sync home
 libreoffice --headless --convert-to pdf <docx> #convert to pdf
 lp -P 1 <pdf> #print first page on default printer
 pdftk A=?.pdf B=?.pdf cat B1 A2-end output ?.pdf #generate PDF from several PDF files (merge, split, delete)
 
+git clone git@10.239.130.226:/git/oem-projects...
 git commit --amend --reset-author
 
 sudo modprobe can
@@ -191,6 +193,19 @@ Name=eth0
 
 [Network]
 Address=192.168.0.20/24
+***************************************************************************************************
+
+###################################################################################################
+###bring up CAN device with systemd-networkd
+###################################################################################################
+#generate file "80-can.network" in /etc/systemd/network
+***************************************************************************************************
+[Match]
+Name=can0
+
+[CAN]
+BitRate=125K
+RestartSec=100ms
 ***************************************************************************************************
 
 ###################################################################################################
@@ -489,7 +504,8 @@ fw_setenv vidargs video=mxcfb0:dev=lcd,EDT-WVGA
 fw_setenv vidargs video=mxcfb0:dev=lcd,800x480M@60,if=RGB24,bpp=24 fbmem=32M
 fw_setenv vidargs video=mxcfb0:dev=hdmi,1280x1024M@60,if=RGB24 fbmem=32M
 fw_setenv vidargs video=mxcfb0:dev=lcd,ETML1010G0DKA@60,if=RGB24,bpp=24 video=mxcfb1:off fbmem=32M
-fw_setenv vidargs video=mxcfb0:dev=lcd,1280x800M@60,if=RGB24 video=mxcfb1:off fbmem=32M
+fw_setenv vidargs "video=mxcfb0:dev=lcd,1280x800M@60,if=RGB24 video=mxcfb1:off fbmem=32M"
+fw_setenv vidargs "video=mxcfb0:dev=lcd,1280x800M@60 video=mxcfb1:off fbmem=32M"
 fw_setenv vidargs video=mxcfb0:dev=lcd,1920x1080M@60,if=RGB24 video=mxcfb1:off fbmem=32M
 
 ###################################################################################################
