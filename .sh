@@ -6,14 +6,24 @@ exit
 ###miscellaneous
 ###################################################################################################
 
+./TestSequenzer SoM_Livetick_Simulation.xml -u agto > /dev/null &
+systemctl stop X
+scp raumedic_neurosmart root@192.168.0.2:/home/root/neurosmart/update
+
+export event=0xF22
+cansend can1 -i 0x203 0x00 0x00 $((event/256)) $event 0x11 0x22 0x33 0x44
+
 QTWEBENGINE_DISABLE_SANDBOX=1
 rsync -a --exclude=.cache --exclude=Downloads --progress /home/$USER /media/agto/agto/rsync #sync home
 libreoffice --headless --convert-to pdf <docx> #convert to pdf
 lp -P 1 <pdf> #print first page on default printer
 pdftk A=?.pdf B=?.pdf cat B1 A2-end output ?.pdf #generate PDF from several PDF files (merge, split, delete)
+pdftk ?.pdf burst #split PDF into single pages
 
 git clone git@10.239.130.226:/git/oem-projects...
 git commit --amend --reset-author
+git tag -a v1.2
+git push --tags
 
 sudo modprobe can
 sudo modprobe can-raw
@@ -45,8 +55,8 @@ sudo ufw allow 67/udp
 export DISPLAY=:0
 xfce4-session-logout -lf
 
-cat language.ini | ./language_ini_to_csv.py > language.csv #INI to CSV for language.ini with python script
-cat language.csv | ./language_csv_to_ini.py #CSV to INI for language.ini with python script
+cat language.ini | /usr/bin/python2.7 language_ini_to_csv.py > language.csv #INI to CSV for language.ini with python script
+cat language.csv | /usr/bin/python2.7 language_csv_to_ini.py #CSV to INI for language.ini with python script
 dd if=/dev/mmcblk1 of=/dev/mmcblk0 bs=1M conv=fsync
 Subsystem sftp internal-sftp #SSH hack for poky build (dmo)
 G_TLS_GNUTLS_PRIORITY="NORMAL:%COMPAT:+VERS-TLS1.0" evolution #start evolution with legacy TLS1.0 support
@@ -499,14 +509,14 @@ fw_setenv setup 'setenv setupargs fec_mac=${ethaddr} no_console_suspend=1 vt.glo
 ###u-boot -> vidargs
 ###################################################################################################
 
-fw_setenv vidargs video=mxcfb0:dev=lcd,FusionF07A
-fw_setenv vidargs video=mxcfb0:dev=lcd,EDT-WVGA
-fw_setenv vidargs video=mxcfb0:dev=lcd,800x480M@60,if=RGB24,bpp=24 fbmem=32M
-fw_setenv vidargs video=mxcfb0:dev=hdmi,1280x1024M@60,if=RGB24 fbmem=32M
-fw_setenv vidargs video=mxcfb0:dev=lcd,ETML1010G0DKA@60,if=RGB24,bpp=24 video=mxcfb1:off fbmem=32M
+fw_setenv vidargs "video=mxcfb0:dev=lcd,FusionF07A"
+fw_setenv vidargs "video=mxcfb0:dev=lcd,EDT-WVGA"
+fw_setenv vidargs "video=mxcfb0:dev=lcd,800x480M@60,if=RGB24,bpp=24 fbmem=32M"
+fw_setenv vidargs "video=mxcfb0:dev=hdmi,1280x1024M@60,if=RGB24 fbmem=32M"
+fw_setenv vidargs "video=mxcfb0:dev=lcd,ETML1010G0DKA@60,if=RGB24,bpp=24 video=mxcfb1:off fbmem=32M"
 fw_setenv vidargs "video=mxcfb0:dev=lcd,1280x800M@60,if=RGB24 video=mxcfb1:off fbmem=32M"
 fw_setenv vidargs "video=mxcfb0:dev=lcd,1280x800M@60 video=mxcfb1:off fbmem=32M"
-fw_setenv vidargs video=mxcfb0:dev=lcd,1920x1080M@60,if=RGB24 video=mxcfb1:off fbmem=32M
+fw_setenv vidargs "video=mxcfb0:dev=lcd,1920x1080M@60,if=RGB24 video=mxcfb1:off fbmem=32M"
 
 ###################################################################################################
 ###commands for rotating display and touch
