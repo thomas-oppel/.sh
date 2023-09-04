@@ -2,13 +2,76 @@
 #prevent executing this script
 exit
 
+
 ###################################################################################################
 ###miscellaneous
 ###################################################################################################
+ps ahux --sort=-c | awk 'NR<=5{printf"%s %6d %s\n",$3,$2,$11}'
+
+
+export PATH_PROTO=/home/agto/projects/altona/altostar/server_mock/v1/Interface
+./protoc -I=proto/ --grpc_out=proto/ --plugin=protoc-gen-grpc=./grpc_cpp_plugin proto/CyclerToServerGeneral.proto
+./protoc -I=$PATH_PROTO --grpc_out=$PATH_PROTO --plugin=protoc-gen-grpc=./grpc_cpp_plugin $PATH_PROTO/CyclerToServerGeneral.proto $PATH_PROTO/CyclerToServerRemote.proto $PATH_PROTO/CyclerToServerService.proto
+./protoc -I=$PATH_PROTO --grpc_out=$PATH_PROTO --plugin=protoc-gen-grpc=./grpc_cpp_plugin $PATH_PROTO/ServerToCyclerGeneral.proto $PATH_PROTO/ServerToCyclerRemote.proto $PATH_PROTO/ServerToCyclerService.proto
+./protoc -I=$PATH_PROTO --grpc_out=$PATH_PROTO --plugin=protoc-gen-grpc=./grpc_cpp_plugin $PATH_PROTO/CyclerToServerServiceInsecure.proto 
+./protoc -I=$PATH_PROTO --cpp_out=$PATH_PROTO $PATH_PROTO/CyclerToServerGeneral.proto $PATH_PROTO/CyclerToServerRemote.proto $PATH_PROTO/CyclerToServerService.proto
+./protoc -I=$PATH_PROTO --cpp_out=$PATH_PROTO $PATH_PROTO/ServerToCyclerGeneral.proto $PATH_PROTO/ServerToCyclerRemote.proto $PATH_PROTO/ServerToCyclerService.proto
+./protoc -I=$PATH_PROTO --cpp_out=$PATH_PROTO $PATH_PROTO/CyclerToServerServiceInsecure.proto
+cmake -DgRPC_INSTALL=ON -DgRPC_BUILD_TESTS=OFF -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$MY_INSTALL_DIR ../..
+
+ip addr del 192.168.56.110 dev enp2s0
+
+LD_LIBRARY_PATH=/opt/pylon/lib:/opt/ic-flow2/usr/lib /opt/ic-flow2/usr/bin/ic-flow2 --camera basler --data /opt/ic-flow2/data --internal enabled
+
+#client_id		292912784087-q0sdo2v3ldordunm0nfkl6j4e6gt46jb.apps.googleusercontent.com
+#client_secret	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
+
+rclone config create --drive-client-id "292912784087-q0sdo2v3ldordunm0nfkl6j4e6gt46jb.apps.googleusercontent.com" --drive-client-secret "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" ic-flow2 drive
+
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 0
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
+gsettings set org.gnome.desktop.screensaver idle-activation-enabled false
+gsettings set org.gnome.settings-daemon.plugins.power idle-dim false
+gsettings set org.gnome.desktop.session idle-delay 0
+
+mogrify *.png
+
+addr2line -asfpC -e dptv 0x114510
+
+cmake -DCMAKE_TOOLCHAIN_FILE=/home/agto/projects/renew/ic-flow-2.0/mxe/usr/i686-w64-mingw32.static/share/cmake/mxe-conf.cmake -DCMAKE_PREFIX_PATH=/home/agto/projects/renew/ic-flow-2.0/mxe/usr/i686-w64-mingw32.static/qt5/
+
+gst-launch-1.0 -v filesrc location=test.png ! decodebin ! videoconvert ! imagefreeze ! autovideosink
+
+docker run -dit --name altostar-imx8 --entrypoint /bin/bash -v /opt/yocto/downloads:/home/yocto/downloads -v /opt/yocto/altostar-imx8/deploy:/home/yocto/deploy altostar-imx8:latest
+docker run -d -p 32778:22 -v /home/agto/projects/clade/mira2:/root/workdir --name clade_build ubuntu:clade_build
+docker run -d -p 32779:22 -v /home/agto/projects/renew/ic-flow-2.0:/root/workdir --name ic-flow2-build ubuntu:ic-flow2-build
+docker run -v /home/agto/projects/altona/altostar/AltoStarApp/:/opt/workdir --name altostar_build_imx8 altostar:build-imx8
+
+LD_LIBRARY_PATH=/opt/pylon/lib:/opt/ic-flow2/deploy/usr/lib startx /opt/ic-flow2/deploy/usr/bin/ic-flow2 --camera basler --data /opt/ic-flow2/deploy/data --internal enabled &
+#configure static IP for ethernet connected to camera
+#implement systemd unit files for check for update, start application 
+#disable X server display blanking
+
+timedatectl set-ntp false
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+sudo update-alternatives --config default.plymouth
+sudo update-initramfs -u -k all 
+sudo apt install gstreamer1.0-libav ubuntu-restricted-extras
+sudo systemctl set-default multi-user.target #disable GUI (Desktop)
+gnome-session-quit #quit GUI (Desktop)
+sudo systemctl set-default graphical #enable GUI (Desktop)
+sudo systemctl start gdm3 #start GUI (Desktop)
+
+xzcat ~/Downloads/ubuntu-core-22-amd64.img.xz | sudo dd of=/dev/sdg bs=32M status=progress
+
+pkg-config --cflags atkmm-1.6
 
 ./TestSequenzer SoM_Livetick_Simulation.xml -u agto > /dev/null &
 systemctl stop X
 scp raumedic_neurosmart root@192.168.0.2:/home/root/neurosmart/update
+
+docker run -d -p 32777:22 -v /home/$USER/projects/$PROJECT/$REPO:/root/workdir -v /home/$USER/projects/$PROJECT/$REPO/build:/root/builddir --name qt_build ubuntu:qt_build
+
 
 export event=0xF22
 cansend can1 -i 0x203 0x00 0x00 $((event/256)) $event 0x11 0x22 0x33 0x44
@@ -67,7 +130,6 @@ cmake -DCMAKE_PREFIX_PATH=$HOME/Qt/5.12.5/gcc_64 .. #...for compiling mxe
 sudo adduser $USER dialout #add user to dialout group to connect serial via putty
 vboxmanage internalcommands createrawvmdk -filename ~/win7.vmdk -rawdisk /dev/sda -partitions 2 -relative #create raw virtual hard disk for virtual box
 ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa #generates authentication keys for SSH
-ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa #generates authentication keys for SSH
 diff -u <file.orig> <file.edited> > file.patch #generate patch file, adapt header
 tar -xvf home_root.tar -C / # extract to root folder
 tar -cvf home_root.tar /home/ #saves home/ recursively to archive
@@ -96,6 +158,61 @@ ip addr add 10.239.134.72/24 dev eth0
 ip route add default via 10.239.135.254
 cat /proc/meminfo #get memory info
 cd ~/oe-core/build/tmp-glibc/work-shared/colibri-imx6/kernel-source/drivers/video/logo/ #path for splash file logo_custom_clut224.ppm
+
+###################################################################################################
+###Disable mouse pointer for X server > /usr/bin/startx
+###################################################################################################
+
+***************************************************************************************************
+defaultserverargs="-nocursor"
+***************************************************************************************************
+
+###################################################################################################
+###Disable display blanking for X server > /etc/X11/xinit/xinitrc
+###################################################################################################
+
+***************************************************************************************************
+xset s off         # don't activate screensaver
+xset -dpms         # disable DPMS (Energy Star) features.
+xset s noblank     # don't blank the video device
+***************************************************************************************************
+
+###################################################################################################
+###QEMU Ubuntu Core
+###################################################################################################
+
+qemu-system-x86_64 \
+    -enable-kvm \
+    -smp 2 \
+    -m 1500 \
+    -cpu host \
+	-vga std \
+    -netdev user,id=mynet0,hostfwd=tcp::8022-:22,hostfwd=tcp::8090-:80 \
+	-net nic \
+    -device virtio-net-pci,netdev=mynet0 \
+    -drive file=ubuntu-core-20-amd64.img,format=raw \
+    -drive file=/usr/share/OVMF/OVMF_CODE.fd,if=pflash,format=raw,unit=0,readonly=on
+	
+ssh thomas-oppel@10.0.2.15
+ssh thomas-oppel@localhost -p 8022
+
+###################################################################################################
+###Unable to negotiate with IP port 22: no matching host key type found. Their offer: ssh-rsa
+###################################################################################################
+
+vim ~/.ssh/config
+
+***************************************************************************************************
+HostkeyAlgorithms +ssh-rsa
+PubkeyAcceptedAlgorithms +ssh-rsa
+***************************************************************************************************
+
+###################################################################################################
+###Deploy fonts to target
+###################################################################################################
+
+#copy all fonts to /usr/share/fonts/ttf
+fc-cache -f -v #clear and regenerate font cache
 
 ###################################################################################################
 ###docker
@@ -206,6 +323,20 @@ Address=192.168.0.20/24
 ***************************************************************************************************
 
 ###################################################################################################
+###assign static IP address in systemd-networkd
+###################################################################################################
+#generate file "<netdev>.network" in /etc/systemd/network
+***************************************************************************************************
+[Match]
+Name=<netdev>
+
+[Network]
+Address=10.239.134.xx/20
+DNS=10.239.130.200
+Gateway=10.239.135.254
+***************************************************************************************************
+
+###################################################################################################
 ###bring up CAN device with systemd-networkd
 ###################################################################################################
 #generate file "80-can.network" in /etc/systemd/network
@@ -217,6 +348,19 @@ Name=can0
 BitRate=125K
 RestartSec=100ms
 ***************************************************************************************************
+
+###################################################################################################
+###assign static IP address with NetworkManager
+###################################################################################################
+nmcli connection
+nmcli connection edit <connection-name>
+nmcli> goto ipv4
+nmcli ipv4> set method manual 
+nmcli ipv4> set addresses 10.239.134.196/24
+nmcli ipv4> set gateway  10.239.135.254
+nmcli ipv4> set dns 10.239.130.200
+nmcli ipv4> save
+nmcli ipv4> quit
 
 ###################################################################################################
 ###delete logfiles older than x days
@@ -509,6 +653,7 @@ fw_setenv setup 'setenv setupargs fec_mac=${ethaddr} no_console_suspend=1 vt.glo
 ###u-boot -> vidargs
 ###################################################################################################
 
+fw_setenv vidargs "video=mxcfb0:1280x800M@60 video=mxcfb1:off fbmem=32M" #AltoStar
 fw_setenv vidargs "video=mxcfb0:dev=lcd,FusionF07A"
 fw_setenv vidargs "video=mxcfb0:dev=lcd,EDT-WVGA"
 fw_setenv vidargs "video=mxcfb0:dev=lcd,800x480M@60,if=RGB24,bpp=24 fbmem=32M"
@@ -517,6 +662,7 @@ fw_setenv vidargs "video=mxcfb0:dev=lcd,ETML1010G0DKA@60,if=RGB24,bpp=24 video=m
 fw_setenv vidargs "video=mxcfb0:dev=lcd,1280x800M@60,if=RGB24 video=mxcfb1:off fbmem=32M"
 fw_setenv vidargs "video=mxcfb0:dev=lcd,1280x800M@60 video=mxcfb1:off fbmem=32M"
 fw_setenv vidargs "video=mxcfb0:dev=lcd,1920x1080M@60,if=RGB24 video=mxcfb1:off fbmem=32M"
+fw_setenv vidargs "video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 fbmem=32M"
 
 ###################################################################################################
 ###commands for rotating display and touch
