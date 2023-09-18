@@ -160,6 +160,13 @@ cat /proc/meminfo #get memory info
 cd ~/oe-core/build/tmp-glibc/work-shared/colibri-imx6/kernel-source/drivers/video/logo/ #path for splash file logo_custom_clut224.ppm
 
 ###################################################################################################
+###Qt Creator settings
+###################################################################################################
+
+#Clang format
+{BasedOnStyle: LLVM, ColumnLimit: '180', IndentWidth: 4, BreakBeforeBraces: Stroustrup, BreakConstructorInitializersBeforeComma: false, AllowShortFunctionsOnASingleLine: false, AlwaysBreakBeforeMultilineStrings: false, Standard: Auto}
+
+###################################################################################################
 ###Disable mouse pointer for X server > /usr/bin/startx
 ###################################################################################################
 
@@ -764,3 +771,4 @@ vi /etc/X11/xinit/xinitrc
 10.239.130.211 #mailserver
 SoftwGit #git
 git20admin2! #gitadmin
+askion1209$@askion
