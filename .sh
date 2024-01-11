@@ -2,12 +2,24 @@
 #prevent executing this script
 exit
 
-
 ###################################################################################################
 ###miscellaneous
 ###################################################################################################
-ps ahux --sort=-c | awk 'NR<=5{printf"%s %6d %s\n",$3,$2,$11}'
+sudo iptables --list --line-numbers # list rules with line numbers
+sudo iptables -D INPUT 3 # delete rule in line number 3 within chain INPUT
+sudo iptables -A INPUT -p tcp --dport 22 -j DROP # block all for SSH
+sudo iptables -A INPUT -p tcp --dport 22 --source 10.239.135.61/32 -j ACCEPT # only allow specific IP for SSH
 
+valgrind --tool=memcheck --leak-check=summary /opt/altostar/current/altostar-gui --log-level-console debug --offline-mode
+
+lsusb -t
+cat /proc/bus/input/devices
+udevadm trigger --dry-run --verbose
+udevadm control --log-priority=debug
+udevadm control --reload-rules
+udevadm trigger
+
+ps ahux --sort=-c | awk 'NR<=5{printf"%s %6d %s\n",$3,$2,$11}'
 
 export PATH_PROTO=/home/agto/projects/altona/altostar/server_mock/v1/Interface
 ./protoc -I=proto/ --grpc_out=proto/ --plugin=protoc-gen-grpc=./grpc_cpp_plugin proto/CyclerToServerGeneral.proto
