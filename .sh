@@ -1,10 +1,16 @@
 #!/bin/sh
-#prevent executing this script
+# prevent executing this script
 exit
 
 ###################################################################################################
-###miscellaneous
+### miscellaneous
 ###################################################################################################
+DISPLAY=:0 xinput test 10
+
+cansend can0 100 # FF00000000000000
+candump -t d can0,100:1F0 | grep -P "0\.0[1-9]" --color
+candump -t d can0,100:1F0 | grep -P "0\.0[1-9]| 100 | 105" --color
+
 sudo iptables --list --line-numbers # list rules with line numbers
 sudo iptables -D INPUT 3 # delete rule in line number 3 within chain INPUT
 sudo iptables -A INPUT -p tcp --dport 22 -j DROP # block all for SSH
@@ -14,6 +20,7 @@ valgrind --tool=memcheck --leak-check=summary /opt/altostar/current/altostar-gui
 
 lsusb -t
 cat /proc/bus/input/devices
+udevadm info --attribute-walk /sys/devices/pci0000:00/0000:00:14.0/usb1/1-4/1-4:1.0
 udevadm trigger --dry-run --verbose
 udevadm control --log-priority=debug
 udevadm control --reload-rules
@@ -35,8 +42,8 @@ ip addr del 192.168.56.110 dev enp2s0
 
 LD_LIBRARY_PATH=/opt/pylon/lib:/opt/ic-flow2/usr/lib /opt/ic-flow2/usr/bin/ic-flow2 --camera basler --data /opt/ic-flow2/data --internal enabled
 
-#client_id		292912784087-q0sdo2v3ldordunm0nfkl6j4e6gt46jb.apps.googleusercontent.com
-#client_secret	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
+# client_id		292912784087-q0sdo2v3ldordunm0nfkl6j4e6gt46jb.apps.googleusercontent.com
+# client_secret	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
 
 rclone config create --drive-client-id "292912784087-q0sdo2v3ldordunm0nfkl6j4e6gt46jb.apps.googleusercontent.com" --drive-client-secret "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" ic-flow2 drive
 
@@ -60,19 +67,19 @@ docker run -d -p 32779:22 -v /home/agto/projects/renew/ic-flow-2.0:/root/workdir
 docker run -v /home/agto/projects/altona/altostar/AltoStarApp/:/opt/workdir --name altostar_build_imx8 altostar:build-imx8
 
 LD_LIBRARY_PATH=/opt/pylon/lib:/opt/ic-flow2/deploy/usr/lib startx /opt/ic-flow2/deploy/usr/bin/ic-flow2 --camera basler --data /opt/ic-flow2/deploy/data --internal enabled &
-#configure static IP for ethernet connected to camera
-#implement systemd unit files for check for update, start application 
-#disable X server display blanking
+# configure static IP for ethernet connected to camera
+# implement systemd unit files for check for update, start application 
+# disable X server display blanking
 
 timedatectl set-ntp false
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 sudo update-alternatives --config default.plymouth
 sudo update-initramfs -u -k all 
 sudo apt install gstreamer1.0-libav ubuntu-restricted-extras
-sudo systemctl set-default multi-user.target #disable GUI (Desktop)
-gnome-session-quit #quit GUI (Desktop)
-sudo systemctl set-default graphical #enable GUI (Desktop)
-sudo systemctl start gdm3 #start GUI (Desktop)
+sudo systemctl set-default multi-user.target # disable GUI (Desktop)
+gnome-session-quit # quit GUI (Desktop)
+sudo systemctl set-default graphical # enable GUI (Desktop)
+sudo systemctl start gdm3 # start GUI (Desktop)
 
 xzcat ~/Downloads/ubuntu-core-22-amd64.img.xz | sudo dd of=/dev/sdg bs=32M status=progress
 
@@ -90,10 +97,10 @@ cansend can1 -i 0x203 0x00 0x00 $((event/256)) $event 0x11 0x22 0x33 0x44
 
 QTWEBENGINE_DISABLE_SANDBOX=1
 rsync -a --exclude=.cache --exclude=Downloads --progress /home/$USER /media/agto/agto/rsync #sync home
-libreoffice --headless --convert-to pdf <docx> #convert to pdf
-lp -P 1 <pdf> #print first page on default printer
-pdftk A=?.pdf B=?.pdf cat B1 A2-end output ?.pdf #generate PDF from several PDF files (merge, split, delete)
-pdftk ?.pdf burst #split PDF into single pages
+libreoffice --headless --convert-to pdf <docx> # convert to pdf
+lp -P 1 <pdf> # print first page on default printer
+pdftk A=?.pdf B=?.pdf cat B1 A2-end output ?.pdf # generate PDF from several PDF files (merge, split, delete)
+pdftk ?.pdf burst # split PDF into single pages
 
 git clone git@10.239.130.226:/git/oem-projects...
 git commit --amend --reset-author
@@ -130,56 +137,56 @@ sudo ufw allow 67/udp
 export DISPLAY=:0
 xfce4-session-logout -lf
 
-cat language.ini | /usr/bin/python2.7 language_ini_to_csv.py > language.csv #INI to CSV for language.ini with python script
-cat language.csv | /usr/bin/python2.7 language_csv_to_ini.py #CSV to INI for language.ini with python script
+cat language.ini | /usr/bin/python2.7 language_ini_to_csv.py > language.csv # INI to CSV for language.ini with python script
+cat language.csv | /usr/bin/python2.7 language_csv_to_ini.py # CSV to INI for language.ini with python script
 dd if=/dev/mmcblk1 of=/dev/mmcblk0 bs=1M conv=fsync
-Subsystem sftp internal-sftp #SSH hack for poky build (dmo)
-G_TLS_GNUTLS_PRIORITY="NORMAL:%COMPAT:+VERS-TLS1.0" evolution #start evolution with legacy TLS1.0 support
-sudo usermod -aG plugdev $USER #accessing device without sudo
-ssh-keyscan -H 192.168.0.2 >> ~/.ssh/known_hosts #add host key to known_hosts file
-pkg-config --cflags --libs gtkmm-2.4 #get dependencies for gtkmm 2.4 for project settings in eclipse without using pkg-config plugin
-cmake -DCMAKE_PREFIX_PATH=$HOME/Qt/5.12.5/gcc_64 .. #...for compiling mxe
-sudo adduser $USER dialout #add user to dialout group to connect serial via putty
-vboxmanage internalcommands createrawvmdk -filename ~/win7.vmdk -rawdisk /dev/sda -partitions 2 -relative #create raw virtual hard disk for virtual box
-ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa #generates authentication keys for SSH
-diff -u <file.orig> <file.edited> > file.patch #generate patch file, adapt header
+Subsystem sftp internal-sftp # SSH hack for poky build (dmo)
+G_TLS_GNUTLS_PRIORITY="NORMAL:%COMPAT:+VERS-TLS1.0" evolution # start evolution with legacy TLS1.0 support
+sudo usermod -aG plugdev $USER # accessing device without sudo
+ssh-keyscan -H 192.168.0.2 >> ~/.ssh/known_hosts # add host key to known_hosts file
+pkg-config --cflags --libs gtkmm-2.4 # get dependencies for gtkmm 2.4 for project settings in eclipse without using pkg-config plugin
+cmake -DCMAKE_PREFIX_PATH=$HOME/Qt/5.12.5/gcc_64 .. # for compiling mxe
+sudo adduser $USER dialout # add user to dialout group to connect serial via putty
+vboxmanage internalcommands createrawvmdk -filename ~/win7.vmdk -rawdisk /dev/sda -partitions 2 -relative # create raw virtual hard disk for virtual box
+ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa # generates authentication keys for SSH
+diff -u <file.orig> <file.edited> > file.patch # generate patch file, adapt header
 tar -xvf home_root.tar -C / # extract to root folder
-tar -cvf home_root.tar /home/ #saves home/ recursively to archive
-vi /etc/systemd/journald.conf #set journal Storage=persistent
-tail -f `ls -tr | tail -1` #follow newest file in current folder
-pkill -f "WriteFileFromTTYMXC *" #kill specific process
-systemctl list-unit-files | grep enabled #list enabled systemd units
-ln -s f1/ current #create a symlink
-ln -sfn /new/target /path/to/symlink #replace an existing symlink
-udevadm monitor -u #monitors current udev rules actions
-dd if=/dev/zero of=/home/root/dummy.img bs=1M count=1000 #generate dummy file on disk
-truncate -s 2500M database.db #generate sparse file with given size
-cpufreq-set -c 0 -f 792000 #set cpu freq to fixed value
-arm-angstrom-linux-gnueabi-gdb #name of gdb debugger
-ssh -X root@192.168.0.2 #ssh connect with X11 forwarding
-find / -type f -size +10000k #list files greater than size
+tar -cvf home_root.tar /home/ # saves home/ recursively to archive
+vi /etc/systemd/journald.conf # set journal Storage=persistent
+tail -f `ls -tr | tail -1` # follow newest file in current folder
+pkill -f "WriteFileFromTTYMXC *" # kill specific process
+systemctl list-unit-files | grep enabled # list enabled systemd units
+ln -s f1/ current # create a symlink
+ln -sfn /new/target /path/to/symlink # replace an existing symlink
+udevadm monitor -u # monitors current udev rules actions
+dd if=/dev/zero of=/home/root/dummy.img bs=1M count=1000 # generate dummy file on disk
+truncate -s 2500M database.db # generate sparse file with given size
+cpufreq-set -c 0 -f 792000 # set cpu freq to fixed value
+arm-angstrom-linux-gnueabi-gdb # name of gdb debugger
+ssh -X root@192.168.0.2 # ssh connect with X11 forwarding
+find / -type f -size +10000k # list files greater than size
 pmap -xq `pidof <app>` | sort -k2,3 | grep -c ? #memory map of specific process
-vi /etc/resolv.conf  #set nameserver to 10.239.135.101
+vi /etc/resolv.conf  # set nameserver to 10.239.135.101
 connmanctl config `connmanctl services | grep ethernet | awk '{print $3}'` --ipv4 manual 10.239.134.150 255.255.255.0 10.239.135.254 #set static IP and gateway
 connmanctl config `connmanctl services | grep ethernet | awk '{print $3}'` --ipv4 manual 192.168.0.2 255.255.255.0 #set static IP
 connmanctl config `connmanctl services | grep ethernet | awk '{print $3}'` --nameservers 10.239.130.200 #set DNS
-connmanctl enable ethernet #enable ethernet permanently
+connmanctl enable ethernet # enable ethernet permanently
 ifconfig eth0 192.168.0.3/24
 ifconfig eth0 10.239.134.72 netmask 255.255.240.0
 ip addr add 10.239.134.72/24 dev eth0
 ip route add default via 10.239.135.254
-cat /proc/meminfo #get memory info
+cat /proc/meminfo # get memory info
 cd ~/oe-core/build/tmp-glibc/work-shared/colibri-imx6/kernel-source/drivers/video/logo/ #path for splash file logo_custom_clut224.ppm
 
 ###################################################################################################
-###Qt Creator settings
+### Qt Creator settings
 ###################################################################################################
 
-#Clang format
+# Clang format
 {BasedOnStyle: LLVM, ColumnLimit: '180', IndentWidth: 4, BreakBeforeBraces: Stroustrup, BreakConstructorInitializersBeforeComma: false, AllowShortFunctionsOnASingleLine: false, AlwaysBreakBeforeMultilineStrings: false, Standard: Auto}
 
 ###################################################################################################
-###Disable mouse pointer for X server > /usr/bin/startx
+### Disable mouse pointer for X server > /usr/bin/startx
 ###################################################################################################
 
 ***************************************************************************************************
@@ -187,7 +194,7 @@ defaultserverargs="-nocursor"
 ***************************************************************************************************
 
 ###################################################################################################
-###Disable display blanking for X server > /etc/X11/xinit/xinitrc
+### Disable display blanking for X server > /etc/X11/xinit/xinitrc
 ###################################################################################################
 
 ***************************************************************************************************
@@ -197,7 +204,7 @@ xset s noblank     # don't blank the video device
 ***************************************************************************************************
 
 ###################################################################################################
-###QEMU Ubuntu Core
+### QEMU Ubuntu Core
 ###################################################################################################
 
 qemu-system-x86_64 \
@@ -216,7 +223,7 @@ ssh thomas-oppel@10.0.2.15
 ssh thomas-oppel@localhost -p 8022
 
 ###################################################################################################
-###Unable to negotiate with IP port 22: no matching host key type found. Their offer: ssh-rsa
+### Unable to negotiate with IP port 22: no matching host key type found. Their offer: ssh-rsa
 ###################################################################################################
 
 vim ~/.ssh/config
@@ -227,14 +234,14 @@ PubkeyAcceptedAlgorithms +ssh-rsa
 ***************************************************************************************************
 
 ###################################################################################################
-###Deploy fonts to target
+### deploy fonts to target
 ###################################################################################################
 
-#copy all fonts to /usr/share/fonts/ttf
+# copy all fonts to /usr/share/fonts/ttf
 fc-cache -f -v #clear and regenerate font cache
 
 ###################################################################################################
-###docker
+### docker
 ###################################################################################################
 
 docker system prune #remove unused data
@@ -244,75 +251,40 @@ docker ps -a #list all running container
 docker inspect <container_id or name>
 docker build -t <?:?> . #build docker image from Dockerfile
 
-#run docker image as container named "qt_build" (<work_dir> is where you checkout your project)
+# run docker image as container named "qt_build" (<work_dir> is where you checkout your project)
 docker run -d -p 32777:22 -v <work_dir>:/root/<your_path> --name qt_build ubuntu:qt_build
 
-#connect to container via SSH
+# connect to container via SSH
 ssh root@localhost -p 32777 #password "root"
 
-#source build environment within container
+# source build environment within container
 . /usr/local/oecore_dornier/environment-setup-cortexa9hf-neon-poky-linux-gnueabi
 
-#cd to <your_path>
+# cd to <your_path>
 cd <your_path>
 
-#generate Makefile using cross-built qmake
+# generate Makefile using cross-built qmake
 /etc/qt5dmo/qt5/bin/qmake <path_to_pro_file> CONFIG+=debug
 make -j<number_of_cores>
 
 docker load < qt_build.tar
 
 ###################################################################################################
-###uBlock Origin
-###################################################################################################
-
-***************************************************************************************************
-google.*##.widget-consent-fullscreen.widget-consent
-||consent.google.com^
-google.*##+js(aeld, DOMContentLoaded, CONSENT)
-www.google.*##div[jsname][jsaction^="dg_close"]
-www.google.*##html:style(overflow: visible !important;)
-www.google.*###lb
-youtube.com##ytd-popup-container
-youtube.com##ytd-consent-bump-lightbox.style-scope
-www.youtube.com##.opened
-***************************************************************************************************
-
-###################################################################################################
-###import and rename duplicated volume group of LVM partitions
+### import and rename duplicated volume group of LVM partitions
 ###################################################################################################
 vgimportclone --basevgname ubuntu-vg_snap /dev/sdc2
 vgchange -ay ubuntu-vg_snap
 vgchange -an ubuntu-vg_snap
 
 ###################################################################################################
-###support legacy SMB1 protocol
+### load kernel module at boot time (vcan) for Ubuntu <= 18.04 LTS
 ###################################################################################################
-#/etc/samba/smb.conf
-***************************************************************************************************
-[global]
-
-case sensitive = yes
-getwd cache = yes
-preserve case = yes
-short preserve case = yes
-socket options = TCP_NODELAY IPTOS_LOWDELAY SO_KEEPALIVE
-ntlm auth = ntlmv1-permitted
-server min protocol = NT1
-server max protocol = NT1
-client min protocol = NT1
-client max protocol = NT1
-***************************************************************************************************
-
-###################################################################################################
-###load kernel module at boot time (vcan) for Ubuntu <= 18.04 LTS
-###################################################################################################
-#/etc/modules
+# /etc/modules
 ***************************************************************************************************
 vcan
 ***************************************************************************************************
 
-#/etc/network/interfaces
+# /etc/network/interfaces
 ***************************************************************************************************
 auto vcan0
    iface vcan0 inet manual
@@ -321,18 +293,18 @@ auto vcan0
 ***************************************************************************************************
 
 ###################################################################################################
-###load kernel module at boot time (vcan) for Ubuntu 20.04 LTS
+### load kernel module at boot time (vcan) for Ubuntu 20.04 LTS
 ###################################################################################################
-#generate file "80-can.network" in /etc/systemd/network
+# generate file "80-can.network" in /etc/systemd/network
 ***************************************************************************************************
 [Match]
 Name=vcan0
 ***************************************************************************************************
 
 ###################################################################################################
-###assign static IP address in systemd-networkd
+### assign static IP address in systemd-networkd
 ###################################################################################################
-#generate file "eth0.network" in /etc/systemd/network
+# generate file "eth0.network" in /etc/systemd/network
 ***************************************************************************************************
 [Match]
 Name=eth0
@@ -342,9 +314,9 @@ Address=192.168.0.20/24
 ***************************************************************************************************
 
 ###################################################################################################
-###assign static IP address in systemd-networkd
+### assign static IP address in systemd-networkd
 ###################################################################################################
-#generate file "<netdev>.network" in /etc/systemd/network
+# generate file "<netdev>.network" in /etc/systemd/network
 ***************************************************************************************************
 [Match]
 Name=<netdev>
@@ -356,9 +328,9 @@ Gateway=10.239.135.254
 ***************************************************************************************************
 
 ###################################################################################################
-###bring up CAN device with systemd-networkd
+### bring up CAN device with systemd-networkd
 ###################################################################################################
-#generate file "80-can.network" in /etc/systemd/network
+# generate file "80-can.network" in /etc/systemd/network
 ***************************************************************************************************
 [Match]
 Name=can0
@@ -369,7 +341,7 @@ RestartSec=100ms
 ***************************************************************************************************
 
 ###################################################################################################
-###assign static IP address with NetworkManager
+### assign static IP address with NetworkManager
 ###################################################################################################
 nmcli connection
 nmcli connection edit <connection-name>
@@ -382,7 +354,7 @@ nmcli ipv4> save
 nmcli ipv4> quit
 
 ###################################################################################################
-###delete logfiles older than x days
+### delete logfiles older than x days
 ###################################################################################################
 if [[ $(ls /home/root/.../log | wc -l) > 1000 ]]
 then
@@ -390,7 +362,7 @@ then
 fi
 
 ###################################################################################################
-###disable GRUB at boot
+### disable GRUB at boot
 ###################################################################################################
 
 ***************************************************************************************************
@@ -404,15 +376,15 @@ set timeout=0
 ***************************************************************************************************
 
 ###################################################################################################
-###enable GTK inspector keybindings (ctrl + d)
+### enable GTK inspector keybindings (ctrl + d)
 ###################################################################################################
-###start dconf-editor
-###navigate to org > gtk > settings > debug
-###set enable-inspector-keybindings to true
+### start dconf-editor
+### navigate to org > gtk > settings > debug
+### set enable-inspector-keybindings to true
 ###################################################################################################
 
 ###################################################################################################
-###install virtualbox 6.0 in ubuntu
+### install virtualbox 6.0 in Ubuntu
 ###################################################################################################
 
 sudo apt update
@@ -424,41 +396,26 @@ sudo apt update
 sudo apt install virtualbox-6.1
 
 ###################################################################################################
-###printers in ubuntu
+### printers in Ubuntu
 ###################################################################################################
 
 sudo systemctl stop cups-browsed
 sudo systemctl disable cups-browsed
-#or
+# or
 sudo cupsctl --no-share-printers
-#or
+# or
 sudo nano /etc/cups/cups-browsed.conf
 ***************************************************************************************************
 BrowseProtocols none
 ***************************************************************************************************
-#or
+# or
 sudo nano /etc/cups/cupsd.conf
 ***************************************************************************************************
 Browsing Off
 ***************************************************************************************************
 
 ###################################################################################################
-###example script for starting application in terminal
-###################################################################################################
-
-***************************************************************************************************
-#!/bin/bash
-
-echo <password> | sudo -S ip link add dev vcan0 type vcan
-echo <password> | sudo -S ip link set up vcan0
-pkill -f "<app>"
-~/tmp/socket_can_simulator &
-pkill -f "<app>"
-gnome-terminal --geometry=600x900+100+100 -x bash -c "cd ~/tmp; GTK_THEME=Adwaita:dark <app> -v"
-***************************************************************************************************
-
-###################################################################################################
-###gsettings
+### gsettings
 ###################################################################################################
 cat ~/.config/gtk-3.0/settings.ini
 
@@ -470,53 +427,30 @@ gtk-long-press-time = 5000
 ***************************************************************************************************
 
 ###################################################################################################
-###required and useful tools for development in linux
+### I2C settings for LM48100Q-Q1 Boomer™ Mono (adapt i2cset tool)
 ###################################################################################################
-sudo apt install geany
-sudo apt install glade
-sudo apt install doublecmd-gtk
-sudo apt install filezilla
-sudo apt install libgtkmm-3.0-dev 
-sudo apt install sqlite3
-sudo apt install compizconfig-settings-manager
-sudo apt install gnome-tweak-tool 
-sudo apt install dconf-editor
-sudo apt install openjdk-11-jre 
-sudo apt install nfs-common 
-sudo apt install libbz2-dev
-sudo apt install libasound2-dev
-sudo apt install libcanberra-gtk3-dev
-sudo apt install can-utils
-sudo apt install subversion
-
-ubuntu-drivers devices
-sudo ubuntu-drivers autoinstall
+/home/root/i2cset -y 2 0x7c 0x14 # power on
+/home/root/i2cset -y 2 0x7c 0x73 # set volume to 0dB (step 20)
+/home/root/i2cset -y 2 0x7c 0x75 # set volume to 3dB (step 22)
+/home/root/i2cset -y 2 0x7c 0x77 # set volume to 6dB (step 24)
+/home/root/i2cset -y 2 0x7c 0x79 # set volume to 9dB (step 26)
+/home/root/i2cset -y 2 0x7c 0x7B # set volume to 12dB (step 28)
+/home/root/i2cset -y 2 0x7c 0x7D # set volume to 15dB (step 30)
+/home/root/i2cset -y 2 0x7c 0x7F # set volume to 18dB (step 32)
+/home/root/i2cset -y 2 0x7c 0x24 # reset diagnostic control
 
 ###################################################################################################
-###I2C settings for LM48100Q-Q1 Boomer™ Mono (adapt i2cset tool)
-###################################################################################################
-/home/root/i2cset -y 2 0x7c 0x14 #power on
-/home/root/i2cset -y 2 0x7c 0x73 #set volume to 0dB (step 20)
-/home/root/i2cset -y 2 0x7c 0x75 #set volume to 3dB (step 22)
-/home/root/i2cset -y 2 0x7c 0x77 #set volume to 6dB (step 24)
-/home/root/i2cset -y 2 0x7c 0x79 #set volume to 9dB (step 26)
-/home/root/i2cset -y 2 0x7c 0x7B #set volume to 12dB (step 28)
-/home/root/i2cset -y 2 0x7c 0x7D #set volume to 15dB (step 30)
-/home/root/i2cset -y 2 0x7c 0x7F #set volume to 18dB (step 32)
-/home/root/i2cset -y 2 0x7c 0x24 #reset diagnostic control
-
-###################################################################################################
-###ALSA
+### ALSA
 ###################################################################################################
 alsamixer
 amixer sset 'Headphone' 100%
 amixer sset 'PCM' 75%
 aplay ding.wav
-speaker-test -c 1 -D hw:0 #pink noise
+speaker-test -c 1 -D hw:0 # pink noise
 speaker-test -t sine -f 1000 -c 1 -D hw:0
 
 ###################################################################################################
-###GPIO (example for set up GPIO port for soft poweroff)
+### GPIO (example for set up GPIO port for soft poweroff)
 ###################################################################################################
 echo 55 > /sys/class/gpio/export
 echo "in" > /sys/class/gpio/gpio55/direction
@@ -525,42 +459,36 @@ echo "falling" > /sys/class/gpio/gpio55/edge
 ###################################################################################################
 ###timedatectl / date / hwclock
 ###################################################################################################
-timedatectl set-local-rtc 1 --adjust-system-clock #disable UTC and use local time (for dual boot)
-timedatectl set-ntp 0 #disable "timesyncd" network time protocol
+timedatectl set-local-rtc 1 --adjust-system-clock # disable UTC and use local time (for dual boot)
+timedatectl set-ntp 0 # disable "timesyncd" network time protocol
 timedatectl set-time "yyyy-mm-dd hh:mm" #set time
 date -s "yyyy-mm-dd hh:mm" #set time
-hwclock -w #set hardware clock (RTC) from system time
-hwclock -s #set system time from hardware clock (RTC)
+hwclock -w # set hardware clock (RTC) from system time
+hwclock -s # set system time from hardware clock (RTC)
 
 ###################################################################################################
-###flashing SOM
+### flashing SOM
 ###################################################################################################
-setenv board_name #colibri_imx6_...
+setenv board_name # colibri_imx6_...
 run setsdupdate
 run update_spl
 run update_uboot
 reset
 
 env default -a
-setenv board_name #colibri_imx6_...
+setenv board_name # colibri_imx6_...
 setenv vidargs
-setenv fdt_file #imx6dl-colibri_....dtb
+setenv fdt_file # imx6dl-colibri_....dtb
 saveenv
 run setsdupdate
 run update
 
 ###################################################################################################
-###resolve apt update issue caused sometimes behind proxies
+### generate dummy sqlite3 database
 ###################################################################################################
-sudo rm -rf /var/lib/apt/lists/partial
-sudo apt-get update -o Acquire::CompressionTypes::Order::=gz
-
-###################################################################################################
-###generate dummy sqlite3 database
-###################################################################################################
-###generate empty database "database.db"
-###read "database_create.sql" script for create all tables, views, triggers, indexes
-###read "database_10d.sql" script for insert dummy data (takes long time depending on script size)
+### generate empty database "database.db"
+### read "database_create.sql" script for create all tables, views, triggers, indexes
+### read "database_10d.sql" script for insert dummy data (takes long time depending on script size)
 ###################################################################################################
 sqlite3 database.db
 .read database_create.sql
@@ -568,12 +496,12 @@ sqlite3 database.db
 .quit
 
 ###################################################################################################
-###install legacy glade designer 3.8.6
+### install legacy glade designer 3.8.6
 ###################################################################################################
-###download source from http://ftp.gnome.org/pub/GNOME/sources/glade3/3.8/
-###extract archive
-###read INSTALL doc -> install necessary packages for "make" first
-###install libgladeui-1-11_3.8.0-0ubuntu6.1_amd64.deb with dpkg
+### download source from http://ftp.gnome.org/pub/GNOME/sources/glade3/3.8/
+### extract archive
+### read INSTALL doc -> install necessary packages for "make" first
+### install libgladeui-1-11_3.8.0-0ubuntu6.1_amd64.deb with dpkg
 ###################################################################################################
 sudo apt install intltool
 sudo apt install libgtk2.0-dev
@@ -585,7 +513,7 @@ sudo make install
 sudo dpkg -i libgladeui-1-11_3.8.0-0ubuntu6.1_amd64.deb
 
 ###################################################################################################
-###install googletest
+### install googletest
 ###################################################################################################
 sudo apt install libgtest-dev cmake
 cd /usr/src/gtest
@@ -594,39 +522,13 @@ sudo make
 sudo cp *.a /usr/lib
 
 ###################################################################################################
-###svn commands
+### using gdb for debugging
 ###################################################################################################
-svn diff -r PREV:COMMITTED <item>
-svn switch ^/trunk
-svn switch ^/branches/features/.../
-svn merge ^/trunk
-svn merge --reintegrate ^/branches/features/... #merge complete branch
-svn move ^/branches/features/... ^/branches/features/... #rename branch
-svn copy ^/trunk ^/branches/bugfixes/... #create branch/tag
-svn copy ^/trunk ^/branches/features/... #create branch/tag
-svn copy ^/trunk/.../ ^/tags/... #create branch/tag 
-svn delete ^/branches/features/... #delete branch
-svn revert --recursive . #revert all
-svn status | grep ^! | awk '{print " --force "$2}' | xargs svn rm #delete missing files
-svn commit --include-externals
-svn resolve --accept mine-conflict -R .
-svn resolve --accept their-conflict -R .
-svn propset svn:global-ignores "Debug" .
-svn propset svn:global-ignores "<binary>" .
-svn propdel svn:global-ignores "Debug" .
-svn proplist -v -R . | grep svn:ignore
-svn propget -R svn:ignore .
-svn status
-svn info
+gdbserver host:2345 <app> # start app with gdbserver
+gdbserver --attach :2345 `pidof <app>` # attach gdbserver to running app
 
 ###################################################################################################
-###using gdb for debugging
-###################################################################################################
-gdbserver host:2345 <app> #start app with gdbserver
-gdbserver --attach :2345 `pidof <app>` #attach gdbserver to running app
-
-###################################################################################################
-###using gdb for analyse coredumps
+### using gdb for analyse coredumps
 ###################################################################################################
 . /usr/local/oecore_.../environment-setup-armv7at2hf-neon-angstrom-linux-gnueabi
 ${CROSS_COMPILE}gdb <app> <coredump>
@@ -635,7 +537,7 @@ info threads
 bt full
 
 ###################################################################################################
-###useful bitbake commands
+### useful bitbake commands
 ###################################################################################################
 . export
 bitbake <target> -c cleansstate
@@ -646,7 +548,7 @@ bitbake -k <target>
 bitbake <target> -c populate_sdk
 
 ###################################################################################################
-###u-boot -> prepare for flash os from booting via sftp
+### u-boot -> prepare for flash os from booting via sftp
 ###################################################################################################
 sudo tar -xjf Colibri_iMX6_LinuxImageV2.8_xxxxxxxx.tar.bz2
 cd ...image_folder...
@@ -663,16 +565,16 @@ fw_setenv bootcmd "if env exists bootcmd_flag; then sleep 3; setenv bootcmd_flag
 reboot
 
 ###################################################################################################
-###u-boot -> remove console tty1 from the boot arguments 
-###u-boot -> disable the blinking cursor by adding vt.global_cursor_default=0
+### u-boot -> remove console tty1 from the boot arguments 
+### u-boot -> disable the blinking cursor by adding vt.global_cursor_default=0
 ###################################################################################################
 fw_setenv setup 'setenv setupargs fec_mac=${ethaddr} no_console_suspend=1 vt.global_cursor_default=0 console=${console},${baudrate}n8'
 
 ###################################################################################################
-###u-boot -> vidargs
+### u-boot -> vidargs
 ###################################################################################################
 
-fw_setenv vidargs "video=mxcfb0:1280x800M@60 video=mxcfb1:off fbmem=32M" #AltoStar
+fw_setenv vidargs "video=mxcfb0:1280x800M@60 video=mxcfb1:off fbmem=32M" # AltoStar
 fw_setenv vidargs "video=mxcfb0:dev=lcd,FusionF07A"
 fw_setenv vidargs "video=mxcfb0:dev=lcd,EDT-WVGA"
 fw_setenv vidargs "video=mxcfb0:dev=lcd,800x480M@60,if=RGB24,bpp=24 fbmem=32M"
@@ -684,24 +586,24 @@ fw_setenv vidargs "video=mxcfb0:dev=lcd,1920x1080M@60,if=RGB24 video=mxcfb1:off 
 fw_setenv vidargs "video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 fbmem=32M"
 
 ###################################################################################################
-###commands for rotating display and touch
+### commands for rotating display and touch
 ###################################################################################################
 
-fbset -t 14064 5 5 18 2 150 3 #set timings for frame buffer device
-xinput set-prop 7 'Coordinate Transformation Matrix' 0 -1 1 1 0 0 0 0 1 #rotate touch 90° left
-xinput set-prop 7 'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1 #rotate touch 90° right
-xinput set-prop 7 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1 #rotate touch 180° inverted
-xrandr -o left #rotate display 90° left
-xrandr -o right #rotate display 90° right
-xrandr -o inverted #rotate display 180° inverted
-xrandr --output "DISP3 BG" --scale 1x0.99125 #scale display output  
+fbset -t 14064 5 5 18 2 150 3 # set timings for frame buffer device
+xinput set-prop 7 'Coordinate Transformation Matrix' 0 -1 1 1 0 0 0 0 1 # rotate touch 90° left
+xinput set-prop 7 'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1 # rotate touch 90° right
+xinput set-prop 7 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1 # rotate touch 180° inverted
+xrandr -o left # rotate display 90° left
+xrandr -o right # rotate display 90° right
+xrandr -o inverted # rotate display 180° inverted
+xrandr --output "DISP3 BG" --scale 1x0.99125 # scale display output  
 
 ###################################################################################################
-###manually calibrate touch after inverting display
+### manually calibrate touch after inverting display
 ###################################################################################################
-###run xinput_calibrator on X startup
-###do calibration
-###write output text manually to /etc/X11/xorg.conf.d/99-calibration.conf
+### run xinput_calibrator on X startup
+### do calibration
+### write output text manually to /etc/X11/xorg.conf.d/99-calibration.conf
 ###################################################################################################
 
 ***************************************************************************************************
@@ -723,7 +625,7 @@ systemctl daemon-reload
 systemctl status runX -n1000
 
 ###################################################################################################
-###systemd service -> autologin
+### systemd service -> autologin
 ###################################################################################################
 ln -sf /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
 vi /etc/systemd/system/getty.target.wants/getty@tty1.service
@@ -742,7 +644,7 @@ systemctl enable getty@tty1.service
 systemctl daemon-reload
 
 ###################################################################################################
-###systemd service -> start script
+### systemd service -> start script
 ###################################################################################################
 vi /lib/systemd/system/<name>.service
 	
@@ -760,7 +662,7 @@ WantedBy=multi-user.target
 ***************************************************************************************************
 
 ###################################################################################################
-###systemd service -> start X server
+### systemd service -> start X server
 ###################################################################################################
 vi /lib/systemd/system/X.service
 	
@@ -780,7 +682,12 @@ systemctl enable X
 systemctl daemon-reload
 vi /etc/X11/xinit/xinitrc
 
-10.239.130.211 #mailserver
-SoftwGit #git
-git20admin2! #gitadmin
+10.239.130.211 # mailserver
+10.239.135.48 # UTAX
+10.239.129.1:65443 # starface
+SoftwGit # git
+git20admin2! # gitadmin
 askion1209$@askion
+cert intermediate X4yhsoBp
+r5K:g9_M
+
