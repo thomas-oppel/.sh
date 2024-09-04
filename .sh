@@ -682,12 +682,15 @@ systemctl enable X
 systemctl daemon-reload
 vi /etc/X11/xinit/xinitrc
 
-10.239.130.211 # mailserver
+10.239.130.211 # Mailserver
 10.239.135.48 # UTAX
-10.239.129.1:65443 # starface
+10.239.129.1:65443 # Starface
+localhost:631 # CUPS
 SoftwGit # git
 git20admin2! # gitadmin
 askion1209$@askion
 cert intermediate X4yhsoBp
 r5K:g9_M
+d1N_5uk2
+y7D!q0_$
 
