@@ -5,6 +5,23 @@ exit
 ###################################################################################################
 ### miscellaneous
 ###################################################################################################
+sudo usermod -aG tty dendrite
+
+jq '.foo = "1"' test.json | sponge test.json
+ffmpeg -i Recording.mp4 -vf "fps=10,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 Recording.gif
+
+apt-offline set --update apt-offline.sig # generate list of updatable packages
+apt-offline get --bundle patches_1.zip apt-offline.sig # create patch bundle
+pro security-status --esm-apps # list esm-apps packages
+
+openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048 # generate private key
+openssl rsa -in private.pem -pubout -out public.pem # generate public key
+openssl dgst -sha256 -sign private.pem -out axon.zip.sig axon.zip # sign file
+openssl dgst -sha256 -verify /opt/axon/public.pem -signature axon.zip.sig axon.zip # verify file
+
+docker run --name ea-mysql -v /opt/projects/enterprise_architect/mysql:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=askion123 -d mysql:5
+find . -xtype l -delete # remove broken symlinks
+
 DISPLAY=:0 xinput test 10
 
 cansend can0 100 # FF00000000000000
@@ -65,6 +82,7 @@ docker run -dit --name altostar-imx8 --entrypoint /bin/bash -v /opt/yocto/downlo
 docker run -d -p 32778:22 -v /home/agto/projects/clade/mira2:/root/workdir --name clade_build ubuntu:clade_build
 docker run -d -p 32779:22 -v /home/agto/projects/renew/ic-flow-2.0:/root/workdir --name ic-flow2-build ubuntu:ic-flow2-build
 docker run -v /home/agto/projects/altona/altostar/AltoStarApp/:/opt/workdir --name altostar_build_imx8 altostar:build-imx8
+docker run -dit --name build-axon --entrypoint /bin/bash -v /home/agto/projects/axon/dendrite/axon_dendrite/:/opt/workdir build-axon:22.04
 
 LD_LIBRARY_PATH=/opt/pylon/lib:/opt/ic-flow2/deploy/usr/lib startx /opt/ic-flow2/deploy/usr/bin/ic-flow2 --camera basler --data /opt/ic-flow2/deploy/data --internal enabled &
 # configure static IP for ethernet connected to camera
@@ -137,8 +155,8 @@ sudo ufw allow 67/udp
 export DISPLAY=:0
 xfce4-session-logout -lf
 
-cat language.ini | /usr/bin/python2.7 language_ini_to_csv.py > language.csv # INI to CSV for language.ini with python script
-cat language.csv | /usr/bin/python2.7 language_csv_to_ini.py # CSV to INI for language.ini with python script
+cat language.ini | python3 language_ini_to_csv.py > language.csv # INI to CSV for language.ini with python script
+cat language.csv | python3 language_csv_to_ini.py # CSV to INI for language.ini with python script
 dd if=/dev/mmcblk1 of=/dev/mmcblk0 bs=1M conv=fsync
 Subsystem sftp internal-sftp # SSH hack for poky build (dmo)
 G_TLS_GNUTLS_PRIORITY="NORMAL:%COMPAT:+VERS-TLS1.0" evolution # start evolution with legacy TLS1.0 support
@@ -339,6 +357,17 @@ Name=can0
 BitRate=125K
 RestartSec=100ms
 ***************************************************************************************************
+
+###################################################################################################
+### add DNS domain
+###################################################################################################
+sudo vim /etc/systemd/resolved.conf
+
+***************************************************************************************************
+Domain=askion.de
+***************************************************************************************************
+
+systemctl restart systemd-resolved.service
 
 ###################################################################################################
 ### assign static IP address with NetworkManager
@@ -684,11 +713,12 @@ vi /etc/X11/xinit/xinitrc
 
 10.239.130.211 # Mailserver
 10.239.135.48 # UTAX
-10.239.129.1:65443 # Starface
+0452:qwertz123@10.239.129.1:65443 # Starface
 localhost:631 # CUPS
 SoftwGit # git
 git20admin2! # gitadmin
-askion1209$@askion
+askion1209$@ASKION_GAST
+askion2021$@ASKION_INTERN
 cert intermediate X4yhsoBp
 r5K:g9_M
 d1N_5uk2
