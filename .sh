@@ -5,6 +5,9 @@ exit
 ###################################################################################################
 ### miscellaneous
 ###################################################################################################
+python3 ts_csv_converter.py export Dendrite_de.ts Dendrite_en.ts Dendrite_es.ts Dendrite_fr.ts Dendrite_it.ts out.csv
+python3 ts_csv_converter.py import out.csv .
+
 sudo usermod -aG tty dendrite
 
 jq '.foo = "1"' test.json | sponge test.json
