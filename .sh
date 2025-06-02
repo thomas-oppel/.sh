@@ -5,6 +5,9 @@ exit
 ###################################################################################################
 ### miscellaneous
 ###################################################################################################
+SYFT_FORMAT_PRETTY=true syft sbom-dendrite:24.04 -o cyclonedx-json=/home/agto/Downloads/sbom-cyclonedx-pretty.json
+python3 TypeFile_Cleanup_20250403.py sbom-cyclonedx-pretty.json
+
 python3 ts_csv_converter.py export Dendrite_de.ts Dendrite_en.ts Dendrite_es.ts Dendrite_fr.ts Dendrite_it.ts out.csv
 python3 ts_csv_converter.py import out.csv .
 
@@ -726,4 +729,6 @@ cert intermediate X4yhsoBp
 r5K:g9_M
 d1N_5uk2
 y7D!q0_$
+d3Nt_r1t3_!maG1nG
+iCfL0w!_2
 
