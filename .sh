@@ -131,6 +131,10 @@ git commit --amend --reset-author
 git tag -a v1.2
 git push --tags
 
+git submodule deinit -f path/to/submodule
+rm -rf .git/modules/path/to/submodule
+git rm -f path/to/submodule
+
 sudo modprobe can
 sudo modprobe can-raw
 sudo modprobe slcan
