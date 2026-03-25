@@ -5,6 +5,8 @@ exit
 ###################################################################################################
 ### miscellaneous
 ###################################################################################################
+cmake .. -DREMOTE_IP=10.239.134.216 -DREMOTE_WORKING_DIR=D:\\Fluo_UI\\
+
 SYFT_FORMAT_PRETTY=true syft sbom-dendrite:24.04 -o cyclonedx-json=/home/agto/Downloads/sbom-cyclonedx-pretty.json
 python3 TypeFile_Cleanup_20250403.py sbom-cyclonedx-pretty.json
 
@@ -734,5 +736,5 @@ r5K:g9_M
 d1N_5uk2
 y7D!q0_$
 d3Nt_r1t3_!maG1nG
-iCfL0w!_2
+!C_F10w_!mag!ng_20
 
